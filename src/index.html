@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Sky Music Simulator</title>
+    <style>
+      .Layout {
+      }
+
+      .Row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1em;
+      }
+
+      .Key {
+        height: 64px;
+        width: 64px;
+        background-color: rgba(0, 0, 0, 0.3);
+        margin-right: 1em;
+        border-radius: 8px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        position: relative;
+      }
+
+      .KeyShape {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .Diamond {
+        border: 1px solid gold;
+        transform: rotate(-45deg);
+        height: 60%;
+        width: 60%;
+      }
+
+      .Circle {
+        border: 1px solid gold;
+        border-radius: 50%;
+        height: 60%;
+        width: 60%;
+      }
+
+      .Composed {
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="./main.js"></script>
+  </body>
+</html>
