@@ -2,9 +2,8 @@ html,
 body,
 #root {
   height: 100%;
-  background-color: #000;
-  color: white;
 }
+
 
 body {
   margin: 0;
@@ -54,18 +53,31 @@ body {
   }
 }
 
+.RootContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  background-color: #fff;
+  color: #333;
+  transition-property: background-color, color;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
+}
+
+.RootContainer.Dark {
+  background-color: #000;
+  color: #ccc;
+}
+
+
 @media only screen and (orientation: portrait) {
-  #root {
+  .RootContainer {
     justify-content: flex-end;
   }
 }
 
-#root {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* justify-content: flex-start; */
-}
 
 .KeyboardLayout {
   color: #ffefae;
@@ -139,7 +151,7 @@ body {
   animation-fill-mode: both;
 }
 
-@keyframes spinner {
+@keyframes flip {
   0% {
     transform: rotate3d(0, 1, 0, 0deg);
   }
@@ -157,7 +169,7 @@ body {
   animation-duration: 0.3s;
   transform: rotate3d(0, 1, 0, 0deg);
   backface-visibility: visible;
-  animation-name: spinner;
+  animation-name: flip;
   animation-timing-function: ease-in-out;
 }
 
@@ -186,26 +198,47 @@ body {
   animation-name: bounceIn;
 }
 
-.Slider {
+.Control {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  min-height: 1.2em;
 }
 
-.Slider + .Slider {
+.Control + .Control {
   margin-top: 12px;
 }
 
-
-.Slider > span { 
+.Control > span { 
   display: inline-block;
   min-width: 3.5em;
+  margin-right: 0.5em;
 }
 
-.Slider > input {
+.Control > input {
   margin-right: 1em;
 }
 
 .KeyboardConfig {
   padding: 16px;
+  display: flex;
+}
+
+.ConfigPanelRight {
+  margin-left: auto
+}
+
+.LoadingSpinner {
+  display: inline-block;
+  width: 0.75em;
+  height: 0.75em;
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spinner 1s ease-in-out infinite;
+  -webkit-animation: spinner 1s ease-in-out infinite;
+}
+
+@keyframes spinner {
+  to { transform: rotate(360deg); }
 }

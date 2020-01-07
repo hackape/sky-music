@@ -22,21 +22,28 @@ function getLayout() {
 const layout = getLayout()
 const letters = 'cdefgab'.toUpperCase().split('')
 
-const instruments = {
-  default: new Tone.PolySynth(10).toMaster()
-}
+const defaultSynth = new Tone.PolySynth(10).toMaster()
+const instruments = { current: defaultSynth, default: defaultSynth }
 
-function loadInstrument(name) {
-  const synth = new Tone.Sampler(INSTRUMENTS[name], {
+function loadInstrument(name, cb) {
+  const urlMap = Object.assign({}, INSTRUMENTS[name])
+
+  const sampleFileCount = Object.keys(urlMap).length
+  let minBy = 1
+  if (sampleFileCount >= 17) minBy = 2
+  if (sampleFileCount >= 33) minBy = 4
+  if (sampleFileCount >= 49) minBy = 6
+  const filtered = Object.keys(urlMap).filter((__, i) => i % minBy != 0)
+  filtered.forEach(key => delete urlMap[key])
+
+  const synth = new Tone.Sampler(urlMap, {
     baseUrl: 'samples/',
     onload: () => {
-      console.log('instruments loaded')
+      instruments[name] = synth
+      instruments.current = synth
+      if (cb) cb()
     }
   }).toMaster()
-
-  instruments.default.dispose()
-
-  instruments.default = synth
 }
 
 globalThis.loadInstrument = loadInstrument
@@ -73,7 +80,21 @@ const v0 = -20
 const v1 = 20
 export default function App() {
   const ctx = useRef({}).current
-  ctx.synth = instruments.default
+
+  const [instrument, setInstrument] = useState('default')
+  const [isLoading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (instruments[instrument]) {
+      instruments.current = instruments[instrument]
+    } else {
+      setLoading(true)
+      loadInstrument(instrument, () => {
+        setLoading(false)
+      })
+    }
+  }, [instrument])
+
   const [tempo, setTempo] = useLocalState('tempo', 100)
 
   useEffect(() => {
@@ -112,7 +133,7 @@ export default function App() {
     }
 
     const note = getNoteFromKeyId(keyId)
-    ctx.synth.triggerAttackRelease(note, '8n')
+    instruments.current.triggerAttackRelease(note, '8n')
   }
 
   ctx.playKey = playKey
@@ -143,73 +164,100 @@ export default function App() {
     }
   }, [])
 
+  const [darkMode, setDarkMode] = useLocalState('DarkMode', 1)
+
   return (
-    <div className='Keyboard'>
-      <div className='KeyboardLayout'>
-        {layout.map((row, i) => {
-          return (
-            <div className='Row' key={`row_${i}`}>
-              {row.map((keyId, j) => {
-                const note = getNoteFromKeyId(keyId)
+    <div className={'RootContainer' + (darkMode ? ' Dark' : '')}>
+      <div className='Keyboard'>
+        <div className='KeyboardLayout'>
+          {layout.map((row, i) => {
+            return (
+              <div className='Row' key={`row_${i}`}>
+                {row.map((keyId, j) => {
+                  const note = getNoteFromKeyId(keyId)
 
-                let shape = j % 2 ? 'diamond' : 'circle'
-                if (keyId % 7 == 0) shape = 'composition'
+                  let shape = j % 2 ? 'diamond' : 'circle'
+                  if (keyId % 7 == 0) shape = 'composition'
 
-                return (
-                  <div
-                    className='Key'
-                    key={`key_${keyId}`}
-                    onMouseDownCapture={() => playKey(keyId)}
-                    onTouchStartCapture={() => playKey(keyId)}
-                  >
-                    <div className='KeyBtn' id={`key_btn_${keyId}`}>
-                      <div className='KeyShape' id={`key_shape_${keyId}`}>
-                        <Shape type={shape} />
+                  return (
+                    <div
+                      className='Key'
+                      key={`key_${keyId}`}
+                      onMouseDownCapture={() => playKey(keyId)}
+                      onTouchStartCapture={() => playKey(keyId)}
+                    >
+                      <div className='KeyBtn' id={`key_btn_${keyId}`}>
+                        <div className='KeyShape' id={`key_shape_${keyId}`}>
+                          <Shape type={shape} />
+                        </div>
                       </div>
+                      <span className='KeyText'>{note}</span>
                     </div>
-                    <span className='KeyText'>{note}</span>
-                  </div>
-                )
-              })}
-            </div>
-          )
-        })}
-      </div>
-      <div className='KeyboardConfig'>
-        <label className='Slider'>
-          <span>Tempo</span>
-          <input
-            type='range'
-            min='30'
-            max='250'
-            onInput={e => setTempo(Number(e.target.value))}
-            value={tempo}
-          ></input>
-          <span>{tempo}bpm</span>
-        </label>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+        <div className='KeyboardConfig'>
+          <div className='ConfigPanelRight'>
+            <label className='Control'>
+              <span>Tempo</span>
+              <input
+                type='range'
+                min='30'
+                max='250'
+                onInput={e => setTempo(Number(e.target.value))}
+                value={tempo}
+              ></input>
+              <span style={{ width: '4em' }}>{tempo}bpm</span>
+            </label>
 
-        <label className='Slider'>
-          <span>Tone</span>
-          <input
-            type='range'
-            min='0'
-            max='14'
-            onInput={e => setToneShift(Number(e.target.value))}
-            value={toneShift}
-          ></input>
-          <span>{getNoteFromKeyId(0)}</span>
-        </label>
-        <label className='Slider'>
-          <span>Volume</span>
-          <input
-            type='range'
-            min='0'
-            max='100'
-            onInput={e => setVol(Number(e.target.value))}
-            value={vol}
-          ></input>
-          <span>{vol}</span>
-        </label>
+            <label className='Control'>
+              <span>Tone</span>
+              <input
+                type='range'
+                min='0'
+                max='14'
+                onInput={e => setToneShift(Number(e.target.value))}
+                value={toneShift}
+              ></input>
+              <span>{getNoteFromKeyId(0)}</span>
+            </label>
+            <label className='Control'>
+              <span>Volume</span>
+              <input
+                type='range'
+                min='0'
+                max='100'
+                onInput={e => setVol(Number(e.target.value))}
+                value={vol}
+              ></input>
+              <span>{vol}</span>
+            </label>
+            <label className='Control'>
+              <span>Instrument</span>
+              <select value={instrument} onInput={e => setInstrument(e.target.value)}>
+                <option value='default'>Synthesizer</option>
+                <option value='guitar'>Guitar (1.6MB)</option>
+                <option value='piano'>Piano (2.7MB)</option>
+              </select>
+              {isLoading ? (
+                <div style={{ marginLeft: '0.5em' }}>
+                  <div className='LoadingSpinner' />
+                </div>
+              ) : null}
+            </label>
+            <label className='Control'>
+              <span>Dark Mode</span>
+              <input
+                type='checkbox'
+                checked={Boolean(darkMode)}
+                onInput={e => setDarkMode(Number(e.target.checked))}
+              />
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   )
