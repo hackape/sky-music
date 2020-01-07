@@ -1,4 +1,3 @@
-// ts-check
 import React, { useRef, useState, useEffect } from 'react'
 import * as Tone from 'tone'
 import { Shape } from './Shape'
