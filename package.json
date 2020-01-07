@@ -7,6 +7,8 @@
     "build": "parcel build src/index.html --no-content-hash --no-source-maps --out-dir docs --public-url /sky-music/"
   },
   "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-transform-react-jsx": "^7.7.7",
     "autoprefixer": "^9.7.3",
     "cssnano": "^4.1.10",
     "typescript": "^3.7.4"
