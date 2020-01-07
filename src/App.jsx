@@ -10,6 +10,8 @@ Object.keys(INSTRUMENTS).forEach(instrument => {
   })
 })
 
+const IS_MOBILE = navigator.maxTouchPoints > 0
+
 globalThis.Tone = Tone
 
 function getLayout() {
@@ -179,13 +181,12 @@ export default function App() {
                   let shape = j % 2 ? 'diamond' : 'circle'
                   if (keyId % 7 == 0) shape = 'composition'
 
+                  const eventHandler = IS_MOBILE
+                    ? { onTouchStart: () => playKey(keyId) }
+                    : { onMouseDown: () => playKey(keyId) }
+
                   return (
-                    <div
-                      className='Key'
-                      key={`key_${keyId}`}
-                      onMouseDownCapture={() => playKey(keyId)}
-                      onTouchStartCapture={() => playKey(keyId)}
-                    >
+                    <div className='Key' key={`key_${keyId}`} {...eventHandler}>
                       <div className='KeyBtn' id={`key_btn_${keyId}`}>
                         <div className='KeyShape' id={`key_shape_${keyId}`}>
                           <Shape type={shape} />
