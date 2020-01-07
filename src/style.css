@@ -1,0 +1,209 @@
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', Avenir, 'Helvetica Neue',
+    Helvetica, Arial, sans-serif;
+  font-weight: 500;
+}
+
+html {
+  font-size: 7px;
+}
+
+body {
+  font-size: 10px;
+}
+
+@media only screen and (min-width: 340px) and (max-width: 639px) {
+  html {
+    font-size: 8px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+}
+
+@media only screen and (min-width: 640px) and (max-width: 1199px) {
+  html {
+    font-size: 1.25vw;
+  }
+
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Desktop ----------- */
+@media only screen and (min-width: 1200px) {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-size: 16px;
+  }
+}
+
+@media only screen and (orientation: portrait) {
+  #root {
+    justify-content: flex-end;
+  }
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: flex-start; */
+}
+
+.KeyboardLayout {
+  color: #ffefae;
+  padding: 12px 0;
+}
+
+.Row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Row + .Row {
+  /* margin-top: 27px; */
+  margin-top: 1.6875rem;
+}
+
+.Key {
+  /* height: 110px;
+  width: 110px;
+  margin: 0 13px;
+  border-radius: 18px; */
+
+  height: 6.875rem;
+  width: 6.875rem;
+  margin: 0 0.8125rem;
+  border-radius: 1.125rem;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+}
+
+.KeyBtn {
+  border-radius: 1.125rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.KeyText {
+  position: relative;
+  user-select: none;
+}
+
+.KeyShape {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.KeyShape > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.animated {
+  animation-duration: 0.4s;
+  animation-fill-mode: both;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate3d(0, 1, 0, 0deg);
+  }
+
+  50% {
+    transform: rotate3d(0, 1, 0, 180deg);
+  }
+
+  100% {
+    transform: rotate3d(0, 1, 0, 360deg);
+  }
+}
+
+.animated.flip {
+  animation-duration: 0.3s;
+  transform: rotate3d(0, 1, 0, 0deg);
+  backface-visibility: visible;
+  animation-name: spinner;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes bounceIn {
+  from,
+  30%,
+  to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+
+  30% {
+    transform: scale3d(0.8, 0.8, 0.8);
+  }
+
+  to {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.bounceIn {
+  animation-duration: 0.4s;
+  animation-name: bounceIn;
+}
+
+.Slider {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.Slider + .Slider {
+  margin-top: 12px;
+}
+
+
+.Slider > span { 
+  display: inline-block;
+  min-width: 3.5em;
+}
+
+.Slider > input {
+  margin-right: 1em;
+}
+
+.KeyboardConfig {
+  padding: 16px;
+}

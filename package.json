@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "autoprefixer": "^9.7.3",
     "cssnano": "^4.1.10",
     "typescript": "^3.7.4"
   },
@@ -11,5 +12,10 @@
     "react": "^16.0.0",
     "react-dom": "^16.12.0",
     "tone": "^13.8.25"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
   }
 }
