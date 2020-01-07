@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "parcel build src/index.html --no-content-hash --no-source-maps --out-dir docs --public-url /sky-music/"
+    "build": "rm docs/*.js docs/*.css && parcel build src/index.html --no-source-maps --out-dir docs --public-url /sky-music/"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
