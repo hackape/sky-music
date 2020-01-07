@@ -11,7 +11,7 @@ Object.keys(INSTRUMENTS).forEach(instrument => {
   })
 })
 
-// globalThis.Tone = Tone
+globalThis.Tone = Tone
 
 function getLayout() {
   const rowOfFive = new Array(5).fill(true)
@@ -25,13 +25,22 @@ const letters = 'cdefgab'.toUpperCase().split('')
 
 const instruments = {
   default: new Tone.PolySynth(10).toMaster()
-  // synth: new Tone.Sampler(INSTRUMENTS['piano'], {
-  //   baseUrl: 'samples/',
-  //   onload: () => {
-  //     console.log('instruments loaded')
-  //   }
-  // }).toMaster()
 }
+
+function loadInstrument(name) {
+  const synth = new Tone.Sampler(INSTRUMENTS[name], {
+    baseUrl: 'samples/',
+    onload: () => {
+      console.log('instruments loaded')
+    }
+  }).toMaster()
+
+  instruments.default.dispose()
+
+  instruments.default = synth
+}
+
+globalThis.loadInstrument = loadInstrument
 
 function useLocalState(key, defaultState) {
   const ctx = useRef({
