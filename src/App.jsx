@@ -135,7 +135,8 @@ export default function App() {
     }
 
     const note = getNoteFromKeyId(keyId)
-    instruments.current.triggerAttackRelease(note, '8n')
+    const ret = instruments.current.triggerAttackRelease(note, '8n')
+    console.log(ret)
   }
 
   ctx.playKey = playKey
