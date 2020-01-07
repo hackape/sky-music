@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react'
 import * as Tone from 'tone'
 import { Shape } from './Shape'
 
+globalThis.Tone = Tone
+
 function getLayout() {
   const rowOfFive = new Array(5).fill(true)
   return [0, 1, 2].map(rowNum => {
@@ -14,11 +16,22 @@ const layout = getLayout()
 const letters = 'cdefgab'.toUpperCase().split('')
 
 const synth = new Tone.PolySynth(10).toMaster()
+
+const v0 = -20
+const v1 = 20
 export default function App() {
   const [tempo, setTempo] = useState(100)
+
   useEffect(() => {
     Tone.Transport.bpm.value = tempo
   }, [tempo])
+
+  const [vol, setVol] = useState(50)
+
+  useEffect(() => {
+    const vol_db = (vol / 100) * (v1 - v0) + v0
+    Tone.Master.volume.value = vol_db
+  }, [vol])
 
   const [toneShift, setToneShift] = useState(7)
 
@@ -129,6 +142,17 @@ export default function App() {
             value={toneShift}
           ></input>
           <span>{getNoteFromKeyId(0)}</span>
+        </label>
+        <label className='Slider'>
+          <span>Volume</span>
+          <input
+            type='range'
+            min='0'
+            max='100'
+            onChange={e => setVol(Number(e.target.value))}
+            value={vol}
+          ></input>
+          <span>{vol}</span>
         </label>
       </div>
     </div>
