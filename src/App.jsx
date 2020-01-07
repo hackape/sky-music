@@ -1,9 +1,17 @@
-// @ts-check
-import React, { useState, useEffect } from 'react'
+// ts-check
+import React, { useRef, useState, useEffect } from 'react'
 import * as Tone from 'tone'
 import { Shape } from './Shape'
+const INSTRUMENTS = require('./instruments.json')
+Object.keys(INSTRUMENTS).forEach(instrument => {
+  const map = INSTRUMENTS[instrument]
+  Object.keys(map).forEach(note => {
+    const value = map[note]
+    map[note] = instrument + '/' + value
+  })
+})
 
-globalThis.Tone = Tone
+// globalThis.Tone = Tone
 
 function getLayout() {
   const rowOfFive = new Array(5).fill(true)
@@ -15,29 +23,67 @@ function getLayout() {
 const layout = getLayout()
 const letters = 'cdefgab'.toUpperCase().split('')
 
-const synth = new Tone.PolySynth(10).toMaster()
+const instruments = {
+  default: new Tone.PolySynth(10).toMaster()
+  // synth: new Tone.Sampler(INSTRUMENTS['piano'], {
+  //   baseUrl: 'samples/',
+  //   onload: () => {
+  //     console.log('instruments loaded')
+  //   }
+  // }).toMaster()
+}
+
+function useLocalState(key, defaultState) {
+  const ctx = useRef({
+    setState(val) {
+      ctx._setState(val)
+      clearTimeout(ctx.timeoutId)
+      ctx.timeoutId = setTimeout(() => {
+        try {
+          localStorage.setItem(key, val)
+        } catch (err) {}
+      }, 500)
+    }
+  }).current
+  let _val
+  if (!ctx.cached) {
+    try {
+      _val = localStorage.getItem(key)
+      _val = Number(_val)
+    } catch (err) {
+    } finally {
+      ctx.cached = _val || defaultState
+    }
+  }
+
+  const [state, setState] = useState(ctx.cached)
+  ctx._setState = setState
+  return [state, ctx.setState]
+}
 
 const v0 = -20
 const v1 = 20
 export default function App() {
-  const [tempo, setTempo] = useState(100)
+  const ctx = useRef({}).current
+  ctx.synth = instruments.default
+  const [tempo, setTempo] = useLocalState('tempo', 100)
 
   useEffect(() => {
     Tone.Transport.bpm.value = tempo
   }, [tempo])
 
-  const [vol, setVol] = useState(50)
+  const [vol, setVol] = useLocalState('volume', 50)
 
   useEffect(() => {
     const vol_db = (vol / 100) * (v1 - v0) + v0
     Tone.Master.volume.value = vol_db
   }, [vol])
 
-  const [toneShift, setToneShift] = useState(7)
+  const [toneShift, setToneShift] = useLocalState('tone', 14)
 
   function getNoteFromKeyId(keyId) {
     const scaleOffset = toneShift % 7
-    const baseLevel = 3 + Math.floor(toneShift / 7)
+    const baseLevel = 2 + Math.floor(toneShift / 7)
     const index = (scaleOffset + (keyId % 7)) % 7
     const levelOffset = Math.floor((scaleOffset + keyId) / 7)
     const note = letters[index] + (baseLevel + levelOffset)
@@ -58,8 +104,10 @@ export default function App() {
     }
 
     const note = getNoteFromKeyId(keyId)
-    synth.triggerAttackRelease(note, '8n')
+    ctx.synth.triggerAttackRelease(note, '8n')
   }
+
+  ctx.playKey = playKey
 
   useEffect(() => {
     const keyCodes = [81, 87, 69, 82, 84, 65, 83, 68, 70, 71, 90, 88, 67, 86, 66]
@@ -72,7 +120,7 @@ export default function App() {
 
       keyCodesPressed.add(e.keyCode)
 
-      playKey(keyId)
+      ctx.playKey(keyId)
     }
 
     function handleKeyUp(e) {
@@ -126,7 +174,7 @@ export default function App() {
             type='range'
             min='30'
             max='250'
-            onChange={e => setTempo(Number(e.target.value))}
+            onInput={e => setTempo(Number(e.target.value))}
             value={tempo}
           ></input>
           <span>{tempo}bpm</span>
@@ -138,7 +186,7 @@ export default function App() {
             type='range'
             min='0'
             max='14'
-            onChange={e => setToneShift(Number(e.target.value))}
+            onInput={e => setToneShift(Number(e.target.value))}
             value={toneShift}
           ></input>
           <span>{getNoteFromKeyId(0)}</span>
@@ -149,7 +197,7 @@ export default function App() {
             type='range'
             min='0'
             max='100'
-            onChange={e => setVol(Number(e.target.value))}
+            onInput={e => setVol(Number(e.target.value))}
             value={vol}
           ></input>
           <span>{vol}</span>

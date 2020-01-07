@@ -3,19 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "build": "parcel build src/index.html --no-content-hash --no-source-maps --out-dir docs --public-url /sky-music/"
+  },
   "devDependencies": {
     "autoprefixer": "^9.7.3",
     "cssnano": "^4.1.10",
     "typescript": "^3.7.4"
   },
   "dependencies": {
-    "react": "^16.0.0",
-    "react-dom": "^16.12.0",
+    "preact": "^10.1.1",
     "tone": "^13.8.25"
   },
   "postcss": {
     "plugins": {
       "autoprefixer": {}
     }
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom/test-utils": "preact/test-utils",
+    "react-dom": "preact/compat"
   }
 }
